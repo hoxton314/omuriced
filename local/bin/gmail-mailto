@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Convert mailto: URL to Gmail compose URL and open in Edge
+
+mailto="$1"
+
+# Remove mailto: prefix
+mailto="${mailto#mailto:}"
+
+# Parse email and query string
+if [[ "$mailto" == *"?"* ]]; then
+    email="${mailto%%\?*}"
+    query="${mailto#*\?}"
+else
+    email="$mailto"
+    query=""
+fi
+
+# URL encode function
+urlencode() {
+    python3 -c "import urllib.parse; print(urllib.parse.quote('$1', safe='@'))"
+}
+
+# Build Gmail compose URL
+gmail_url="https://mail.google.com/mail/?view=cm&fs=1"
+
+if [[ -n "$email" ]]; then
+    gmail_url="${gmail_url}&to=${email}"
+fi
+
+# Parse query params (subject, body, cc, bcc)
+if [[ -n "$query" ]]; then
+    # Extract subject
+    if [[ "$query" =~ subject=([^&]*) ]]; then
+        gmail_url="${gmail_url}&su=${BASH_REMATCH[1]}"
+    fi
+    # Extract body
+    if [[ "$query" =~ body=([^&]*) ]]; then
+        gmail_url="${gmail_url}&body=${BASH_REMATCH[1]}"
+    fi
+    # Extract cc
+    if [[ "$query" =~ cc=([^&]*) ]]; then
+        gmail_url="${gmail_url}&cc=${BASH_REMATCH[1]}"
+    fi
+    # Extract bcc
+    if [[ "$query" =~ bcc=([^&]*) ]]; then
+        gmail_url="${gmail_url}&bcc=${BASH_REMATCH[1]}"
+    fi
+fi
+
+exec microsoft-edge "$gmail_url"

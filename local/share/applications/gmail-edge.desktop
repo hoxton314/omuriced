@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Gmail (Edge)
+Comment=Open mailto links in Gmail via Edge
+Exec=/home/hoxton/.local/bin/gmail-mailto %u
+Type=Application
+NoDisplay=true
+MimeType=x-scheme-handler/mailto;
+Categories=Network;Email;
