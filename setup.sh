@@ -93,7 +93,7 @@ done
 # Update desktop database
 echo ""
 echo "Updating desktop database..."
-update-desktop-database "$HOME/.local/share/applications/" 2>/dev/null || true
+update-desktop-database "$HOME/.local/share/applications/" || echo "Warning: update-desktop-database failed (command may not be installed)"
 
 echo ""
 echo "Setup complete!"
