@@ -1,0 +1,3 @@
+[submodule "config/waybar/modules/waybar-mpris-enhanced"]
+	path = config/waybar/modules/waybar-mpris-enhanced
+	url = git@github.com:hoxton314/waybar-mpris-enhanced.git
