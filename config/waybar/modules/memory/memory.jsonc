@@ -1,0 +1,8 @@
+{
+  "custom/memory": {
+    "exec": "~/.config/waybar/modules/memory/memory-tooltip.sh",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "omarchy-launch-or-focus-tui btop"
+  }
+}

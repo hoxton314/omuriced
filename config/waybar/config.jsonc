@@ -13,24 +13,26 @@
     "clock",
     "custom/update",
     "custom/voxtype",
-    "custom/screenrecording-indicator",
-    // "idle_inhibitor"
-    "gamemode"
+    "custom/screenrecording-indicator"
   ],
   "modules-right": [
     "tray",
+    "gamemode",
+    "idle_inhibitor",
     "bluetooth",
     "network",
     "pulseaudio",
     "temperature",
     "cpu",
-    "memory",
+    "custom/memory",
     "battery"
   ],
-  "include": ["./modules/waybar-mpris-enhanced/mpris-enhanced.jsonc"],
+  "include": [
+    "./modules/waybar-mpris-enhanced/mpris-enhanced.jsonc",
+    "./modules/memory/memory.jsonc"
+  ],
   "hyprland/workspaces": {
     "on-click": "activate",
-    "format": "{icon}",
     "format-icons": {
       "default": "",
       "1": "1",
@@ -81,17 +83,21 @@
     "on-click": "omarchy-launch-or-focus-tui btop",
     "on-click-right": "alacritty"
   },
-  "memory": {
-    "interval": 5,
-    "format": "󰘚  {percentage}%",
-    "on-click": "omarchy-launch-or-focus-tui btop"
-  },
   "clock": {
     "interval": 1,
     "format": "{:L%A %H:%M %d.%m.%Y}",
     "format-alt": "{:L%H:%M:%S %d.%m.%Y W%V}",
     "tooltip": false,
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "󰷛 ",
+      "deactivated": "󰍹 "
+    },
+    "timeout": 30.5,
+    "tooltip": false
   },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
