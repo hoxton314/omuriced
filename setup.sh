@@ -96,6 +96,12 @@ echo "Updating desktop database..."
 update-desktop-database "$HOME/.local/share/applications/" || echo "Warning: update-desktop-database failed (command may not be installed)"
 
 echo ""
+echo "=== Configuring git submodules ==="
+git -C "$SCRIPT_DIR" submodule update --init --recursive
+git -C "$SCRIPT_DIR" config submodule.recurse true
+echo "Submodules initialized and auto-update enabled."
+
+echo ""
 echo "Setup complete!"
 echo "Your configs are now symlinked to this repo."
 echo "Run 'git pull' in this repo to update configs across devices."
