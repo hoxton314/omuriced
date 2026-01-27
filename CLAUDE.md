@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Overview
 
-Personal Omarchy dotfiles repo - **desktop-multiple-monitors** branch.
+Personal Omarchy dotfiles repo. Syncs configs between machines by copying files.
 
 **Key principle:** Theme provides colors, waybar/hyprland configs are separate.
 
@@ -17,17 +17,23 @@ Personal Omarchy dotfiles repo - **desktop-multiple-monitors** branch.
 
 ## Structure
 
-- `config/waybar/` - Full waybar config (16px font for desktop displays)
-- `config/hypr/` - Hyprland overrides (multi-monitor: HDMI-A-1, DP-1, DP-3)
+- `config/waybar/` - Full waybar config (layout, modules, styling)
+- `config/hypr/` - Hyprland overrides (monitors, bindings, etc.)
 - `config/omarchy/themes/omuriced/` - Theme (colors.toml, waybar.css, backgrounds)
 - `config/omarchy/branding/` - Custom branding
 - `config/walker/` - App launcher config
 - `local/bin/` - Custom scripts
 
-## Desktop-specific Settings
+## How Omarchy Theming Works
 
-- `monitors.conf` - Multi-monitor layout (3 monitors)
-- `waybar/style.css` - 16px font (larger than laptop's 12px)
+1. **Theme** provides colors via `colors.toml` and `waybar.css`
+2. **Waybar config** (`~/.config/waybar/`) is separate - imports theme colors via CSS
+3. **Hyprland** sources theme config + personal overrides
+
+The `waybar/style.css` imports colors from the active theme:
+```css
+@import '../omarchy/current/theme/waybar.css';
+```
 
 ## After Editing
 
