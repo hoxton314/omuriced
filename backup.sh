@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Backup existing configs before setting up symlinks
-# Run this BEFORE setup.sh on a new system
+# Backup existing configs before syncing
+# Run this BEFORE sync.sh on a new system
 
 set -e
 
@@ -12,12 +12,15 @@ CONFIGS=(
     "hypr"
     "waybar"
     "walker"
-    "omarchy"
-    "alacritty"
-    "kitty"
-    "ghostty"
     "starship.toml"
     "mimeapps.list"
+)
+
+# ~/.config/omarchy subdirs to backup
+OMARCHY_SUBDIRS=(
+    "themes/omuriced"
+    "branding"
+    "extensions"
 )
 
 # ~/.local/bin scripts to backup
@@ -32,6 +35,7 @@ LOCAL_APPS=(
 
 echo "Creating backup directory: $BACKUP_DIR"
 mkdir -p "$BACKUP_DIR/config"
+mkdir -p "$BACKUP_DIR/config/omarchy/themes"
 mkdir -p "$BACKUP_DIR/local/bin"
 mkdir -p "$BACKUP_DIR/local/share/applications"
 
@@ -44,6 +48,19 @@ for config in "${CONFIGS[@]}"; do
         cp -r "$source_path" "$BACKUP_DIR/config/"
     else
         echo "Skipping (not found): .config/$config"
+    fi
+done
+
+echo ""
+echo "=== Backing up ~/.config/omarchy (subdirs only) ==="
+for subdir in "${OMARCHY_SUBDIRS[@]}"; do
+    source_path="$HOME/.config/omarchy/$subdir"
+    if [ -e "$source_path" ]; then
+        echo "Backing up: .config/omarchy/$subdir"
+        mkdir -p "$BACKUP_DIR/config/omarchy/$(dirname "$subdir")"
+        cp -r "$source_path" "$BACKUP_DIR/config/omarchy/$subdir"
+    else
+        echo "Skipping (not found): .config/omarchy/$subdir"
     fi
 done
 
@@ -73,4 +90,4 @@ done
 
 echo ""
 echo "Backup complete: $BACKUP_DIR"
-echo "You can now run setup.sh to create symlinks"
+echo "You can now run sync.sh to apply configs"

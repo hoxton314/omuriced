@@ -1,62 +1,62 @@
-# omuriced
+# omuriced (desktop-multiple-monitors)
 
-Personal dotfiles for [Omarchy](https://omarchy.dev) - a Hyprland-based Linux desktop environment.
+Personal dotfiles for [Omarchy](https://omarchy.org/) - desktop setup with multiple monitors.
 
-## Installation
+This repo contains:
+- Custom **omuriced** theme (colors, styling)
+- Custom **waybar** config (layout, modules, MPRIS, memory) - larger font for desktop
+- Personal **Hyprland** overrides (multi-monitor setup)
+
+## Usage
 
 ```bash
 # Clone with submodules
-git clone --recurse-submodules git@github.com:hoxton314/omuriced.git
+git clone --recurse-submodules -b desktop-multiple-monitors git@github.com:hoxton314/omuriced.git
 
-# Backup existing configs (optional, recommended on new systems)
+# Backup existing configs (optional)
 ./backup.sh
 
-# Create symlinks and configure submodules
-./setup.sh
+# Sync configs and activate theme
+./sync.sh
 ```
 
 ## Updating
 
 ```bash
-git pull
-```
-
-If you didn't run `setup.sh` (which enables automatic submodule updates), use:
-
-```bash
 git pull --recurse-submodules
+./sync.sh
 ```
 
 ## Structure
 
 ```
 config/
-├── hypr/           # Hyprland window manager
-├── waybar/         # Status bar
-├── walker/         # Application launcher
-├── omarchy/        # Theme system
-├── alacritty/      # Terminal
-├── kitty/          # Terminal
-├── ghostty/        # Terminal
-├── starship.toml   # Shell prompt
-└── mimeapps.list   # Default applications
+├── hypr/                    # Personal Hyprland overrides
+│   ├── monitors.conf        # Multi-monitor config (HDMI-A-1, DP-1, DP-3)
+│   ├── bindings.conf        # Custom keybindings
+│   └── ...
+├── waybar/                  # Custom waybar (16px font for desktop)
+│   ├── config.jsonc
+│   ├── style.css
+│   └── modules/
+├── omarchy/
+│   ├── themes/omuriced/     # Custom theme
+│   ├── branding/
+│   └── extensions/
+├── walker/config.toml
+├── starship.toml
+└── mimeapps.list
 
 local/
-├── bin/            # Custom scripts
-└── share/applications/  # Desktop entries
+├── bin/gmail-mailto
+└── share/applications/
 ```
+
+## Branches
+
+- `master` - laptop config
+- `desktop-multiple-monitors` - desktop with multiple monitors (this branch)
 
 ## Submodules
 
-This repo uses git submodules for external dependencies:
-
 - `config/waybar/modules/waybar-mpris-enhanced` - Enhanced MPRIS module for Waybar
-
-## Hyprland Customization
-
-The main `hyprland.conf` sources files in order:
-1. Omarchy defaults (system-managed)
-2. Theme config from `~/.config/omarchy/current/theme/`
-3. Personal overrides from `~/.config/hypr/*.conf` (this repo)
-
-Edit the personal override files to customize behavior while preserving Omarchy defaults.
