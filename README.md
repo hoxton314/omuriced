@@ -3,6 +3,7 @@
 Personal dotfiles for [Omarchy](https://omarchy.org/) - a Hyprland-based Linux desktop environment.
 
 This repo contains:
+
 - Custom **omuriced** theme (colors, styling)
 - Custom **waybar** config (layout, modules, MPRIS, memory)
 - Personal **Hyprland** overrides (monitors, bindings, etc.)
@@ -13,7 +14,7 @@ This repo contains:
 # Clone with submodules
 git clone --recurse-submodules git@github.com:hoxton314/omuriced.git
 
-# Backup existing configs (optional, recommended on new systems)
+# Backup existing configs (optional)
 ./backup.sh
 
 # Sync configs and activate theme
@@ -65,16 +66,19 @@ local/
 ## How It Works
 
 **Theme** (`config/omarchy/themes/omuriced/`):
+
 - `colors.toml` defines the color palette
 - Omarchy generates terminal configs from colors.toml
 - `waybar.css` provides color variables for waybar styling
 
 **Waybar** (`config/waybar/`):
+
 - Full waybar config separate from theme
 - `style.css` imports colors from the active theme via `@import '../omarchy/current/theme/waybar.css'`
 - Custom modules: memory tooltip, enhanced MPRIS controls
 
 **Hyprland** (`config/hypr/`):
+
 - Personal overrides sourced after Omarchy defaults
 - Machine-specific settings (monitors, bindings, etc.)
 

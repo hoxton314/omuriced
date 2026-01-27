@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Backup existing configs before setting up symlinks
-# Run this BEFORE setup.sh on a new system
+# Backup existing configs before syncing
+# Run this BEFORE sync.sh on a new system
 
 set -e
 
@@ -90,4 +90,4 @@ done
 
 echo ""
 echo "Backup complete: $BACKUP_DIR"
-echo "You can now run setup.sh to create symlinks"
+echo "You can now run sync.sh to apply configs"
