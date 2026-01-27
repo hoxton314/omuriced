@@ -1,62 +1,42 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Overview
 
-This is a dotfiles repository for Omarchy, a Hyprland-based Linux desktop environment. It contains:
-- A custom theme (`omuriced`) in `config/omarchy/themes/omuriced/`
-- Personal Hyprland overrides in `config/hypr/`
-- Custom branding and extensions
+Personal Omarchy dotfiles repo. Syncs configs between machines by copying files.
 
-The repo symlinks specific items to `~/.config/` and `~/.local/` directories.
+**Key principle:** Theme provides colors, waybar/hyprland configs are separate.
 
-## Setup Commands
+## Quick Reference
 
 ```bash
-# Backup existing configs before setup (run on new systems)
-./backup.sh
-
-# Create symlinks from repo to ~/.config and ~/.local
-./setup.sh
-
-# Activate the custom theme
-omarchy-theme-set omuriced
+./backup.sh   # Backup existing configs before syncing
+./sync.sh     # Copy configs to ~/.config and activate theme
 ```
 
-## Repository Structure
+## Structure
 
-- `config/omarchy/themes/omuriced/` - Custom theme (main content)
-  - `colors.toml` - Color palette (Omarchy generates terminal configs from this)
-  - `waybar/` - Status bar config with custom modules
-  - `backgrounds/` - Wallpapers
-  - Terminal, hyprlock, mako, walker styling files
+- `config/waybar/` - Full waybar config (layout, modules, styling)
+- `config/hypr/` - Hyprland overrides (monitors, bindings, etc.)
+- `config/omarchy/themes/omuriced/` - Theme (colors.toml, waybar.css, backgrounds)
+- `config/omarchy/branding/` - Custom branding
+- `config/walker/` - App launcher config
+- `local/bin/` - Custom scripts
 
-- `config/omarchy/branding/` - Custom about screen branding
-- `config/omarchy/extensions/` - Menu extensions
+## How Omarchy Theming Works
 
-- `config/hypr/` - Personal Hyprland overrides
-  - `monitors.conf`, `bindings.conf`, `input.conf`, etc.
-  - These override Omarchy defaults and are machine-specific
+1. **Theme** provides colors via `colors.toml` and `waybar.css`
+2. **Waybar config** (`~/.config/waybar/`) is separate - imports theme colors via CSS
+3. **Hyprland** sources theme config + personal overrides
 
-- `config/walker/config.toml` - Application launcher settings
-- `config/starship.toml` - Shell prompt
-- `config/mimeapps.list` - Default applications
+The `waybar/style.css` imports colors from the active theme:
+```css
+@import '../omarchy/current/theme/waybar.css';
+```
 
-- `local/bin/` - Custom scripts (gmail-mailto)
-- `local/share/applications/` - Desktop entries
+## After Editing
 
-## Theme System
-
-Custom themes go in `~/.config/omarchy/themes/`. The `colors.toml` file is the main definition - Omarchy auto-generates terminal colors, hyprland theme, and other app configs from it.
-
-After making changes to the theme, run `omarchy-theme-set omuriced` to regenerate and apply.
-
-## Hyprland Configuration Pattern
-
-The main `hyprland.conf` sources files in order:
-1. Omarchy defaults from `~/.local/share/omarchy/default/hypr/` (system-managed)
-2. Theme config from `~/.config/omarchy/current/theme/hyprland.conf` (generated)
-3. Personal overrides from `~/.config/hypr/*.conf` (this repo)
-
-Edit the personal override files to customize behavior while preserving Omarchy defaults.
+- Hyprland: auto-reloads on save
+- Waybar: run `omarchy-restart-waybar`
+- Theme changes: run `omarchy-theme-set omuriced`

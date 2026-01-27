@@ -10,6 +10,7 @@ BACKUP_DIR="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
 # ~/.config items to backup
 CONFIGS=(
     "hypr"
+    "waybar"
     "walker"
     "starship.toml"
     "mimeapps.list"

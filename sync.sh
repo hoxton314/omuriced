@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Sync Omarchy configs by copying files (instead of symlinks)
-# Then activate the omuriced theme
+# Sync Omarchy configs by copying files
+# Then activate the omuriced theme and restart services
 
 set -e
 
@@ -13,6 +13,7 @@ LOCAL_DIR="$SCRIPT_DIR/local"
 # ~/.config directories to copy
 CONFIG_DIRS=(
     "hypr"
+    "waybar"
     "walker"
 )
 
@@ -107,9 +108,18 @@ echo ""
 echo "=== Setting theme to omuriced ==="
 if command -v omarchy-theme-set &> /dev/null; then
     omarchy-theme-set omuriced
-    echo "Theme set to omuriced"
 else
-    echo "Warning: omarchy-theme-set not found. Set theme manually with: omarchy-theme-set omuriced"
+    echo "Warning: omarchy-theme-set not found. Set theme manually."
+fi
+
+# Restart waybar to apply changes
+echo ""
+echo "=== Restarting waybar ==="
+if command -v omarchy-restart-waybar &> /dev/null; then
+    omarchy-restart-waybar
+else
+    pkill waybar 2>/dev/null || true
+    waybar &>/dev/null &
 fi
 
 echo ""

@@ -1,10 +1,13 @@
 # omuriced
 
-Personal dotfiles for [Omarchy](https://omarchy.dev) - a Hyprland-based Linux desktop environment.
+Personal dotfiles for [Omarchy](https://omarchy.org/) - a Hyprland-based Linux desktop environment.
 
-This repo contains a custom **omuriced** theme and personal Hyprland overrides.
+This repo contains:
+- Custom **omuriced** theme (colors, styling)
+- Custom **waybar** config (layout, modules, MPRIS, memory)
+- Personal **Hyprland** overrides (monitors, bindings, etc.)
 
-## Installation
+## Usage
 
 ```bash
 # Clone with submodules
@@ -13,23 +16,15 @@ git clone --recurse-submodules git@github.com:hoxton314/omuriced.git
 # Backup existing configs (optional, recommended on new systems)
 ./backup.sh
 
-# Create symlinks and configure submodules
-./setup.sh
-
-# Activate the custom theme
-omarchy-theme-set omuriced
+# Sync configs and activate theme
+./sync.sh
 ```
 
 ## Updating
 
 ```bash
-git pull
-```
-
-If you didn't run `setup.sh` (which enables automatic submodule updates), use:
-
-```bash
 git pull --recurse-submodules
+./sync.sh
 ```
 
 ## Structure
@@ -43,18 +38,22 @@ config/
 │   ├── bindings.conf        # Custom keybindings
 │   ├── looknfeel.conf       # Visual overrides
 │   ├── autostart.conf       # Startup applications
-│   ├── hypridle.conf        # Idle behavior
-│   ├── hyprlock.conf        # Lock screen config
-│   └── hyprsunset.conf      # Color temperature
+│   └── ...
+├── waybar/                  # Custom waybar (replaces Omarchy default)
+│   ├── config.jsonc         # Layout, modules, behavior
+│   ├── style.css            # Styling (imports theme colors)
+│   └── modules/             # Custom modules
+│       ├── memory/          # Memory usage module
+│       └── waybar-mpris-enhanced/  # MPRIS music controls
 ├── omarchy/
 │   ├── themes/omuriced/     # Custom theme
-│   │   ├── colors.toml      # Color palette (generates terminal configs)
+│   │   ├── colors.toml      # Color palette
+│   │   ├── waybar.css       # Waybar color variables
 │   │   ├── backgrounds/     # Wallpapers
-│   │   ├── waybar/          # Status bar config + modules
 │   │   └── ...              # Other theme files
-│   ├── branding/            # Custom branding (about screen)
+│   ├── branding/            # Custom branding
 │   └── extensions/          # Menu extensions
-├── walker/config.toml       # Application launcher settings
+├── walker/config.toml       # Application launcher
 ├── starship.toml            # Shell prompt
 └── mimeapps.list            # Default applications
 
@@ -63,30 +62,22 @@ local/
 └── share/applications/      # Desktop entries
 ```
 
-## Custom Theme
+## How It Works
 
-The `omuriced` theme lives in `config/omarchy/themes/omuriced/`. After running `setup.sh`, activate it with:
+**Theme** (`config/omarchy/themes/omuriced/`):
+- `colors.toml` defines the color palette
+- Omarchy generates terminal configs from colors.toml
+- `waybar.css` provides color variables for waybar styling
 
-```bash
-omarchy-theme-set omuriced
-```
+**Waybar** (`config/waybar/`):
+- Full waybar config separate from theme
+- `style.css` imports colors from the active theme via `@import '../omarchy/current/theme/waybar.css'`
+- Custom modules: memory tooltip, enhanced MPRIS controls
 
-The theme includes:
-- Color palette (`colors.toml`) - used to generate terminal colors
-- Waybar configuration with custom memory module and MPRIS controls
-- Styling for walker, hyprlock, mako notifications, and more
-
-## Hyprland Customization
-
-The main `hyprland.conf` sources files in order:
-1. Omarchy defaults (system-managed)
-2. Theme config from the active theme
-3. Personal overrides from `~/.config/hypr/*.conf` (this repo)
-
-Edit the personal override files to customize behavior while preserving Omarchy defaults.
+**Hyprland** (`config/hypr/`):
+- Personal overrides sourced after Omarchy defaults
+- Machine-specific settings (monitors, bindings, etc.)
 
 ## Submodules
 
-This repo uses git submodules for external dependencies:
-
-- `config/omarchy/themes/omuriced/waybar/modules/waybar-mpris-enhanced` - Enhanced MPRIS module for Waybar
+- `config/waybar/modules/waybar-mpris-enhanced` - Enhanced MPRIS module for Waybar
