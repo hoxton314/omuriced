@@ -51,4 +51,3 @@ x-scheme-handler/discord=vesktop.desktop
 
 [Added Associations]
 application/x-zerosize=code.desktop;
-text/plain=code.desktop;
