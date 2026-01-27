@@ -9,6 +9,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$SCRIPT_DIR/config"
 LOCAL_DIR="$SCRIPT_DIR/local"
+ETC_DIR="$SCRIPT_DIR/etc"
 
 # ~/.config directories to copy
 CONFIG_DIRS=(
@@ -38,6 +39,11 @@ LOCAL_BIN=(
 # ~/.local/share/applications entries to copy
 LOCAL_APPS=(
     "gmail-edge.desktop"
+)
+
+# /etc/udev/rules.d files to copy (requires sudo)
+UDEV_RULES=(
+    "99-wlmouse-dpi.rules"
 )
 
 echo "Repo directory: $SCRIPT_DIR"
@@ -97,6 +103,27 @@ echo "=== Syncing ~/.local/share/applications ==="
 for app in "${LOCAL_APPS[@]}"; do
     sync_copy "$LOCAL_DIR/share/applications/$app" "$HOME/.local/share/applications/$app" ".local/share/applications/$app"
 done
+
+echo ""
+echo "=== Syncing /etc/udev/rules.d (requires sudo) ==="
+for rule in "${UDEV_RULES[@]}"; do
+    source_path="$ETC_DIR/udev/rules.d/$rule"
+    target_path="/etc/udev/rules.d/$rule"
+    if [ ! -e "$source_path" ]; then
+        echo "Skipping (not in repo): $rule"
+        continue
+    fi
+    if [ -e "$target_path" ]; then
+        echo "Replacing: /etc/udev/rules.d/$rule"
+    else
+        echo "Copying: /etc/udev/rules.d/$rule"
+    fi
+    sudo cp "$source_path" "$target_path"
+done
+# Reload udev rules
+echo "Reloading udev rules..."
+sudo udevadm control --reload-rules
+sudo udevadm trigger
 
 # Update desktop database
 echo ""

@@ -1,0 +1,1 @@
+ACTION=="add|change", SUBSYSTEM=="input", ENV{ID_VENDOR_ID}=="36a7", ENV{MOUSE_DPI}="1600@2000"
