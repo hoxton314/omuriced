@@ -1,6 +1,6 @@
 
 [Default Applications]
-text/plain=nvim.desktop
+text/plain=code.desktop
 text/english=nvim.desktop
 text/x-makefile=nvim.desktop
 text/x-c++hdr=nvim.desktop
@@ -47,3 +47,8 @@ application/ogg=mpv.desktop
 x-scheme-handler/mailto=gmail-edge.desktop
 x-scheme-handler/gitkraken=GitKraken.desktop
 x-scheme-handler/aether=aether-protocol-handler.desktop
+x-scheme-handler/postman=Postman.desktop
+x-scheme-handler/discord=vesktop.desktop
+
+[Added Associations]
+application/x-zerosize=code.desktop;
