@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Setup symlinks for Omarchy configs
-# This script removes existing configs and creates symlinks to the repo
+# This script creates symlinks to the repo for personal overrides and custom theme
 # Run backup.sh first if you want to preserve existing configs!
 
 set -e
@@ -14,18 +14,20 @@ LOCAL_DIR="$SCRIPT_DIR/local"
 # ~/.config directories to symlink
 CONFIG_DIRS=(
     "hypr"
-    "waybar"
     "walker"
-    "omarchy"
-    "alacritty"
-    "kitty"
-    "ghostty"
 )
 
 # ~/.config files to symlink
 CONFIG_FILES=(
     "starship.toml"
     "mimeapps.list"
+)
+
+# ~/.config/omarchy subdirectories to symlink (not the whole omarchy folder)
+OMARCHY_SUBDIRS=(
+    "themes/omuriced"
+    "branding"
+    "extensions"
 )
 
 # ~/.local/bin scripts to symlink
@@ -79,6 +81,13 @@ for config in "${CONFIG_FILES[@]}"; do
 done
 
 echo ""
+echo "=== Setting up ~/.config/omarchy (subdirs only) ==="
+mkdir -p "$HOME/.config/omarchy/themes"
+for subdir in "${OMARCHY_SUBDIRS[@]}"; do
+    setup_symlink "$CONFIG_DIR/omarchy/$subdir" "$HOME/.config/omarchy/$subdir" ".config/omarchy/$subdir"
+done
+
+echo ""
 echo "=== Setting up ~/.local/bin ==="
 for script in "${LOCAL_BIN[@]}"; do
     setup_symlink "$LOCAL_DIR/bin/$script" "$HOME/.local/bin/$script" ".local/bin/$script"
@@ -104,4 +113,8 @@ echo "Submodules initialized and auto-update enabled."
 echo ""
 echo "Setup complete!"
 echo "Your configs are now symlinked to this repo."
+echo ""
+echo "To activate the omuriced theme, run:"
+echo "  omarchy-theme-set omuriced"
+echo ""
 echo "Run 'git pull' in this repo to update configs across devices."

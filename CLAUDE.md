@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a dotfiles repository for Omarchy, a Hyprland-based Linux desktop environment. It manages personal configurations that symlink to `~/.config/` and `~/.local/` directories.
+This is a dotfiles repository for Omarchy, a Hyprland-based Linux desktop environment. It contains:
+- A custom theme (`omuriced`) in `config/omarchy/themes/omuriced/`
+- Personal Hyprland overrides in `config/hypr/`
+- Custom branding and extensions
+
+The repo symlinks specific items to `~/.config/` and `~/.local/` directories.
 
 ## Setup Commands
 
@@ -14,36 +19,44 @@ This is a dotfiles repository for Omarchy, a Hyprland-based Linux desktop enviro
 
 # Create symlinks from repo to ~/.config and ~/.local
 ./setup.sh
+
+# Activate the custom theme
+omarchy-theme-set omuriced
 ```
 
 ## Repository Structure
 
-- `config/` - Configuration files that symlink to `~/.config/`
-  - `hypr/` - Hyprland window manager config (modular: monitors, bindings, looknfeel, autostart, input)
-  - `waybar/` - Status bar (config.jsonc + style.css)
-  - `walker/` - Application launcher
-  - `omarchy/` - Theme system (current theme in `current/theme/`, hooks, extensions)
-  - `alacritty/`, `kitty/`, `ghostty/` - Terminal emulators
-  - `starship.toml` - Shell prompt
-  - `mimeapps.list` - Default applications
+- `config/omarchy/themes/omuriced/` - Custom theme (main content)
+  - `colors.toml` - Color palette (Omarchy generates terminal configs from this)
+  - `waybar/` - Status bar config with custom modules
+  - `backgrounds/` - Wallpapers
+  - Terminal, hyprlock, mako, walker styling files
 
-- `local/` - Files that symlink to `~/.local/`
-  - `bin/` - Custom scripts (gmail-mailto)
-  - `share/applications/` - Desktop entries
+- `config/omarchy/branding/` - Custom about screen branding
+- `config/omarchy/extensions/` - Menu extensions
+
+- `config/hypr/` - Personal Hyprland overrides
+  - `monitors.conf`, `bindings.conf`, `input.conf`, etc.
+  - These override Omarchy defaults and are machine-specific
+
+- `config/walker/config.toml` - Application launcher settings
+- `config/starship.toml` - Shell prompt
+- `config/mimeapps.list` - Default applications
+
+- `local/bin/` - Custom scripts (gmail-mailto)
+- `local/share/applications/` - Desktop entries
+
+## Theme System
+
+Custom themes go in `~/.config/omarchy/themes/`. The `colors.toml` file is the main definition - Omarchy auto-generates terminal colors, hyprland theme, and other app configs from it.
+
+After making changes to the theme, run `omarchy-theme-set omuriced` to regenerate and apply.
 
 ## Hyprland Configuration Pattern
 
 The main `hyprland.conf` sources files in order:
-1. Omarchy defaults from `~/.local/share/omarchy/default/hypr/` (system-managed, don't edit)
-2. Theme config from `~/.config/omarchy/current/theme/hyprland.conf`
+1. Omarchy defaults from `~/.local/share/omarchy/default/hypr/` (system-managed)
+2. Theme config from `~/.config/omarchy/current/theme/hyprland.conf` (generated)
 3. Personal overrides from `~/.config/hypr/*.conf` (this repo)
 
 Edit the personal override files to customize behavior while preserving Omarchy defaults.
-
-## Theme System
-
-Current theme stored in `config/omarchy/current/`:
-- `theme.name` - Theme identifier (e.g., tokyo-night)
-- `theme/` - Theme assets (colors.toml, terminal configs, CSS files, backgrounds)
-
-Theme files provide consistent styling across waybar, walker, terminals, hyprlock, mako notifications, etc.
