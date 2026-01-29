@@ -7,13 +7,13 @@
   "modules-left": [
     "custom/omarchy",
     "hyprland/workspaces",
-    "group/enhanced-mpris"
+    "group/enhanced-mpris",
   ],
   "modules-center": [
     "clock",
     "custom/update",
     "custom/voxtype",
-    "custom/screenrecording-indicator"
+    "custom/screenrecording-indicator",
   ],
   "modules-right": [
     "tray",
@@ -25,11 +25,11 @@
     "temperature",
     "cpu",
     "custom/memory",
-    "battery"
+    "battery",
   ],
   "include": [
     "./modules/waybar-mpris-enhanced/mpris-enhanced.jsonc",
-    "./modules/memory/memory.jsonc"
+    "./modules/memory/memory.jsonc",
   ],
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -45,21 +45,21 @@
       "8": "8",
       "9": "9",
       "10": "0",
-      "active": "󱓻"
+      "active": "󱓻",
     },
     "persistent-workspaces": {
       "1": [],
       "2": [],
       "3": [],
       "4": [],
-      "5": []
-    }
+      "5": [],
+    },
   },
   "custom/omarchy": {
     "format": "<span font='omarchy'>\ue900</span>",
     "on-click": "omarchy-menu",
     "on-click-right": "xdg-terminal-exec",
-    "tooltip-format": "Omarchy Menu\n\nSuper + Alt + Space"
+    "tooltip-format": "Omarchy Menu\n\nSuper + Alt + Space",
   },
   "custom/update": {
     "format": "",
@@ -67,37 +67,36 @@
     "on-click": "omarchy-launch-floating-terminal-with-presentation omarchy-update",
     "tooltip-format": "Omarchy update available",
     "signal": 7,
-    "interval": 21600
+    "interval": 21600,
   },
-
   "temperature": {
     "interval": 5,
+    "hwmon-path": "/sys/class/hwmon/hwmon3/temp1_input",
     "format": "󰔏 {temperatureC}°C",
-    // "format": "󰔏 {temperatureC}󰔄",
     "critical-threshold": 80,
-    "tooltip-format": "{temperatureC}°C / {temperatureF}°F"
+    "tooltip-format": "{temperatureC}°C / {temperatureF}°F",
   },
   "cpu": {
     "interval": 5,
     "format": "󰍛  {usage}%",
     "on-click": "omarchy-launch-or-focus-tui btop",
-    "on-click-right": "alacritty"
+    "on-click-right": "alacritty",
   },
   "clock": {
     "interval": 1,
     "format": "{:L%A %H:%M %d.%m.%Y}",
     "format-alt": "{:L%H:%M:%S %d.%m.%Y W%V}",
     "tooltip": false,
-    "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
+    "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select",
   },
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
       "activated": "󰷛 ",
-      "deactivated": "󰍹 "
+      "deactivated": "󰍹 ",
     },
     "timeout": 30.5,
-    "tooltip": false
+    "tooltip": false,
   },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
@@ -110,7 +109,7 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "omarchy-launch-wifi"
+    "on-click": "omarchy-launch-wifi",
   },
   "battery": {
     "format": "{icon} {capacity}%",
@@ -119,7 +118,7 @@
     "format-plugged": " {capacity}%",
     "format-icons": {
       "charging": ["󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"],
-      "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+      "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
     },
     "format-full": "󰂅 100%",
     "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
@@ -128,8 +127,8 @@
     "on-click": "omarchy-menu power",
     "states": {
       "warning": 20,
-      "critical": 10
-    }
+      "critical": 10,
+    },
   },
   "bluetooth": {
     "format": "",
@@ -138,7 +137,7 @@
     "format-connected": "󰂱",
     "format-no-controller": "",
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "omarchy-launch-bluetooth"
+    "on-click": "omarchy-launch-bluetooth",
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
@@ -154,7 +153,7 @@
     "format-max": " MAX",
     "format-icons": {
       "headphone": "",
-      "default": [" ", "", "", "", "", "", "", "", "", ""]
+      "default": [" ", "", "", "", "", "", "", "", "", ""],
     },
     "states": {
       "muted": "muted",
@@ -162,12 +161,12 @@
       "five": 5,
       "ten": 10,
       "high": 95,
-      "max": 100
-    }
+      "max": 100,
+    },
   },
   "tray": {
     "icon-size": 16,
-    "spacing": 8
+    "spacing": 8,
   },
   "mpris": {
     "format": "{player_icon} {title} 󰒮 {status_icon} 󰒭",
@@ -179,28 +178,28 @@
       "edge": "",
       "vlc": "󰕼",
       "mpv": "",
-      "soundcloud": ""
+      "soundcloud": "",
       // optional 
     },
     "on-click": {
       "1": "playerctl play-pause",
       "2": "playerctl next",
-      "3": "playerctl previous"
+      "3": "playerctl previous",
     },
     "status-icons": {
       "paused": "",
       "playing": "",
       "stopped": "",
-      "default": ""
+      "default": "",
     },
     "title-len": 20,
-    "tooltip-format": "{player_icon} {player}: {artist} - {title}"
+    "tooltip-format": "{player_icon} {player}: {artist} - {title}",
   },
   "custom/screenrecording-indicator": {
     "on-click": "omarchy-cmd-screenrecord",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/screen-recording.sh",
     "signal": 8,
-    "return-type": "json"
+    "return-type": "json",
   },
   "custom/voxtype": {
     "exec": "omarchy-voxtype-status",
@@ -209,10 +208,10 @@
     "format-icons": {
       "idle": "",
       "recording": "󰍬",
-      "transcribing": "󰔟"
+      "transcribing": "󰔟",
     },
     "tooltip": true,
     "on-click-right": "omarchy-voxtype-config",
-    "on-click": "omarchy-voxtype-model"
-  }
+    "on-click": "omarchy-voxtype-model",
+  },
 }
