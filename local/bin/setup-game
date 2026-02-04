@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Gaming layout setup
+# HDMI-A-1 (left)  - WS 3: Vesktop (Discord)
+# DP-1 (main)      - WS 1: Steam
+# DP-3 (right)     - WS 2: Zen Browser
+
+set -euo pipefail
+
+KEEP_CLASSES=("vesktop" "zen" "steam")
+
+# Check if a class should be kept
+should_keep() {
+  local class="$1"
+  for keep in "${KEEP_CLASSES[@]}"; do
+    if [[ "${class,,}" == "${keep,,}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Close all windows except the ones we want to keep
+echo "==> Closing other windows"
+hyprctl clients -j | jq -r '.[] | "\(.address) \(.class)"' | while read -r addr class; do
+  if ! should_keep "$class"; then
+    echo "    Closing $class ($addr)"
+    hyprctl dispatch closewindow "address:$addr"
+  fi
+done
+
+sleep 0.5
+
+# Check if a window with given class is already running
+is_running() {
+  hyprctl clients -j | jq -e ".[] | select(.class == \"$1\")" > /dev/null 2>&1
+}
+
+# Wait for a new window matching a class on a workspace (up to 5s)
+wait_for_window() {
+  local class="$1"
+  local ws="$2"
+  for _ in $(seq 1 50); do
+    sleep 0.1
+    if hyprctl clients -j | jq -e ".[] | select(.class == \"$class\" and .workspace.id == $ws)" > /dev/null 2>&1; then
+      return 0
+    fi
+  done
+  echo "Warning: timed out waiting for $class on workspace $ws"
+  return 1
+}
+
+# Launch app if not already running, then move to target workspace
+launch_or_move() {
+  local class="$1"
+  local cmd="$2"
+  local ws="$3"
+
+  if is_running "$class"; then
+    echo "==> $class already running, moving to workspace $ws"
+    local addr
+    addr=$(hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | head -1)
+    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+  else
+    echo "==> Launching $cmd on workspace $ws"
+    hyprctl dispatch exec "[workspace $ws] $cmd"
+    wait_for_window "$class" "$ws"
+  fi
+}
+
+# Assign workspaces to monitors
+hyprctl dispatch moveworkspacetomonitor "1 DP-1"
+hyprctl dispatch moveworkspacetomonitor "2 DP-3"
+hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
+
+launch_or_move "steam" "steam" 1
+launch_or_move "zen" "zen-browser" 2
+launch_or_move "vesktop" "vesktop" 3
+
+# Focus main monitor
+hyprctl dispatch workspace 1
+
+echo "Gaming setup complete!"

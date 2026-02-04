@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Work layout setup
+# HDMI-A-1 (left)  - WS 3: GitKraken (left) | Slack (right top) / Vesktop (right bottom)
+# DP-1 (main)      - WS 1: VS Code
+# DP-3 (right)     - WS 2: Zen Browser
+
+set -euo pipefail
+
+# Check if a window with given class is already running
+is_running() {
+  hyprctl clients -j | jq -e ".[] | select(.class == \"$1\")" > /dev/null 2>&1
+}
+
+# Wait for a new window matching a class on a workspace (up to 5s)
+wait_for_window() {
+  local class="$1"
+  local ws="$2"
+  for _ in $(seq 1 50); do
+    sleep 0.1
+    if hyprctl clients -j | jq -e ".[] | select(.class == \"$class\" and .workspace.id == $ws)" > /dev/null 2>&1; then
+      return 0
+    fi
+  done
+  echo "Warning: timed out waiting for $class on workspace $ws"
+  return 1
+}
+
+# Launch app if not already running, then move to target workspace
+launch_or_move() {
+  local class="$1"
+  local cmd="$2"
+  local ws="$3"
+
+  if is_running "$class"; then
+    echo "==> $class already running, moving to workspace $ws"
+    local addr
+    addr=$(hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | head -1)
+    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+  else
+    echo "==> Launching $cmd on workspace $ws"
+    hyprctl dispatch exec "[workspace $ws] $cmd"
+    wait_for_window "$class" "$ws"
+  fi
+}
+
+# Assign workspaces to monitors
+hyprctl dispatch moveworkspacetomonitor "1 DP-1"
+hyprctl dispatch moveworkspacetomonitor "2 DP-3"
+hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
+
+# Switch to workspace 3 first so tiling order is correct
+hyprctl dispatch workspace 3
+
+launch_or_move "code" "code" 1
+launch_or_move "zen" "zen-browser" 2
+
+# Workspace 3 apps in tiling order: GitKraken -> Slack -> Vesktop
+launch_or_move "GitKraken" "gitkraken" 3
+launch_or_move "Slack" "slack" 3
+launch_or_move "vesktop" "vesktop" 3
+
+# Focus main monitor
+hyprctl dispatch workspace 1
+
+echo "Work setup complete!"
