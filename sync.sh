@@ -41,6 +41,11 @@ LOCAL_APPS=(
     "gmail-edge.desktop"
 )
 
+# /etc files to copy (requires sudo)
+ETC_FILES=(
+    "locale.conf"
+)
+
 # /etc/udev/rules.d files to copy (requires sudo)
 UDEV_RULES=(
     "99-wlmouse-dpi.rules"
@@ -102,6 +107,23 @@ echo ""
 echo "=== Syncing ~/.local/share/applications ==="
 for app in "${LOCAL_APPS[@]}"; do
     sync_copy "$LOCAL_DIR/share/applications/$app" "$HOME/.local/share/applications/$app" ".local/share/applications/$app"
+done
+
+echo ""
+echo "=== Syncing /etc files (requires sudo) ==="
+for etc_file in "${ETC_FILES[@]}"; do
+    source_path="$ETC_DIR/$etc_file"
+    target_path="/etc/$etc_file"
+    if [ ! -e "$source_path" ]; then
+        echo "Skipping (not in repo): $etc_file"
+        continue
+    fi
+    if [ -e "$target_path" ]; then
+        echo "Replacing: /etc/$etc_file"
+    else
+        echo "Copying: /etc/$etc_file"
+    fi
+    sudo cp "$source_path" "$target_path"
 done
 
 echo ""
