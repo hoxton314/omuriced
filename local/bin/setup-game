@@ -3,11 +3,11 @@
 # Gaming layout setup
 # HDMI-A-1 (left)  - WS 3: Vesktop (Discord)
 # DP-1 (main)      - WS 1: Steam
-# DP-3 (right)     - WS 2: Zen Browser
+# DP-3 (right)     - WS 2: Chromium
 
 set -euo pipefail
 
-KEEP_CLASSES=("vesktop" "zen" "steam")
+KEEP_CLASSES=("vesktop" "chromium" "steam")
 
 # Check if a class should be kept
 should_keep() {
@@ -74,7 +74,7 @@ hyprctl dispatch moveworkspacetomonitor "2 DP-3"
 hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
 
 launch_or_move "steam" "steam" 1
-launch_or_move "zen" "zen-browser" 2
+launch_or_move "chromium" "chromium" 2
 launch_or_move "vesktop" "vesktop" 3
 
 # Focus main monitor
