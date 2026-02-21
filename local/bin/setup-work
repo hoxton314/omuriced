@@ -3,7 +3,7 @@
 # Work layout setup
 # HDMI-A-1 (left)  - WS 3: GitKraken (left) | Slack (right top) / Vesktop (right bottom)
 # DP-1 (main)      - WS 1: VS Code
-# DP-3 (right)     - WS 2: Chromium
+# DP-3 (right)     - WS 2: Chrome Canary
 
 set -euo pipefail
 
@@ -53,7 +53,7 @@ hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
 hyprctl dispatch workspace 3
 
 launch_or_move "code" "code" 1
-launch_or_move "chromium" "chromium" 2
+launch_or_move "google-chrome-canary" "google-chrome-canary" 2
 
 # Workspace 3 apps in tiling order: GitKraken -> Slack -> Vesktop
 launch_or_move "GitKraken" "gitkraken" 3
