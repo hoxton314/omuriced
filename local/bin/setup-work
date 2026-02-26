@@ -1,46 +1,61 @@
 #!/bin/bash
 
 # Work layout setup
-# HDMI-A-1 (left)  - WS 3: GitKraken (left) | Slack (right top) / Vesktop (right bottom)
+# HDMI-A-1 (left)  - WS 3: GitKraken (full left) | Vesktop (top right) / Slack (bottom right)
 # DP-1 (main)      - WS 1: VS Code
 # DP-3 (right)     - WS 2: Chrome Canary
 
 set -euo pipefail
 
-# Check if a window with given class is already running
-is_running() {
-  hyprctl clients -j | jq -e ".[] | select(.class == \"$1\")" > /dev/null 2>&1
+# PID-unique prefix so repeated runs don't collide
+RULE_PREFIX="setup-$$"
+TEMP_RULE_NAMES=()
+
+# Get the address of an already-running window by class
+get_window_addr() {
+  hyprctl clients -j | jq -r ".[] | select(.class == \"$1\") | .address" | head -1
 }
 
-# Wait for a new window matching a class on a workspace (up to 5s)
+# Wait for a window with given class to exist anywhere (up to 10s)
 wait_for_window() {
   local class="$1"
-  local ws="$2"
-  for _ in $(seq 1 50); do
+  for _ in $(seq 1 100); do
     sleep 0.1
-    if hyprctl clients -j | jq -e ".[] | select(.class == \"$class\" and .workspace.id == $ws)" > /dev/null 2>&1; then
+    if [[ -n "$(get_window_addr "$class")" ]]; then
       return 0
     fi
   done
-  echo "Warning: timed out waiting for $class on workspace $ws"
+  echo "Warning: timed out waiting for $class to appear"
   return 1
 }
 
-# Launch app if not already running, then move to target workspace
+# Move all windows of a class to a workspace
+move_all_to_ws() {
+  local class="$1"
+  local ws="$2"
+  hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | while read -r addr; do
+    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+  done
+}
+
+# Launch app if not already running, ensure it ends up on target workspace
 launch_or_move() {
   local class="$1"
   local cmd="$2"
   local ws="$3"
+  local rule_name="${RULE_PREFIX}-${class,,}"
 
-  if is_running "$class"; then
+  if [[ -n "$(get_window_addr "$class")" ]]; then
     echo "==> $class already running, moving to workspace $ws"
-    local addr
-    addr=$(hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | head -1)
-    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+    move_all_to_ws "$class" "$ws"
   else
-    echo "==> Launching $cmd on workspace $ws"
-    hyprctl dispatch exec "[workspace $ws] $cmd"
-    wait_for_window "$class" "$ws"
+    echo "==> Launching $cmd → workspace $ws"
+    # Named window rule catches ALL windows of this class (splash + main)
+    hyprctl keyword "windowrule[$rule_name]:match:class" "$class"
+    hyprctl keyword "windowrule[$rule_name]:workspace" "$ws silent"
+    TEMP_RULE_NAMES+=("$rule_name")
+    hyprctl dispatch exec "$cmd"
+    wait_for_window "$class" || return 1
   fi
 }
 
@@ -49,13 +64,10 @@ hyprctl dispatch moveworkspacetomonitor "1 DP-1"
 hyprctl dispatch moveworkspacetomonitor "2 DP-3"
 hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
 
-# Switch to workspace 3 first so tiling order is correct
-hyprctl dispatch workspace 3
-
 launch_or_move "code" "code" 1
 launch_or_move "google-chrome-canary" "google-chrome-canary" 2
 
-# Workspace 3 apps in tiling order: GitKraken -> Slack -> Vesktop
+# Workspace 3 apps
 launch_or_move "GitKraken" "gitkraken" 3
 launch_or_move "Slack" "slack" 3
 launch_or_move "vesktop" "vesktop" 3
@@ -64,3 +76,41 @@ launch_or_move "vesktop" "vesktop" 3
 hyprctl dispatch workspace 1
 
 echo "Work setup complete!"
+
+# Background: wait for all 3 non-floating windows on ws3, then re-tile in
+# correct dwindle order (1st=full left, 2nd=top right, 3rd=bottom right)
+# and clean up temporary window rules after
+(
+  for _ in $(seq 1 60); do
+    sleep 0.5
+    clients=$(hyprctl clients -j)
+    gk=$(echo "$clients" | jq -r '[.[] | select(.class == "GitKraken" and .floating == false)] | first | .address // empty')
+    vk=$(echo "$clients" | jq -r '[.[] | select(.class == "vesktop" and .floating == false)] | first | .address // empty')
+    sl=$(echo "$clients" | jq -r '[.[] | select(.class == "Slack" and .floating == false)] | first | .address // empty')
+    [[ -n "$gk" && -n "$vk" && -n "$sl" ]] || continue
+
+    # Pull all three off ws3
+    hyprctl --batch "dispatch movetoworkspacesilent special:arrange,address:$gk ; dispatch movetoworkspacesilent special:arrange,address:$vk ; dispatch movetoworkspacesilent special:arrange,address:$sl"
+    sleep 0.1
+
+    # Re-add in dwindle order. movetoworkspacesilent does NOT update the
+    # active window on the target ws, so dwindle always splits the 1st
+    # window. We must focuswindow after the 2nd to make dwindle split
+    # the right side for the 3rd.
+    hyprctl dispatch movetoworkspacesilent "3,address:$gk"   # 1st: full
+    sleep 0.1
+    hyprctl dispatch movetoworkspacesilent "3,address:$vk"   # 2nd: splits GK → GK left, VK right
+    sleep 0.1
+    hyprctl dispatch focuswindow "address:$vk"               # make VK active on ws3
+    sleep 0.1
+    hyprctl dispatch movetoworkspacesilent "3,address:$sl"   # 3rd: splits VK → VK top-right, SL bottom-right
+    hyprctl dispatch workspace 1                              # refocus main monitor
+    break
+  done
+
+  # Clean up temporary window rules
+  for name in "${TEMP_RULE_NAMES[@]}"; do
+    hyprctl keyword "windowrule[$name]:enable" false 2>/dev/null
+  done
+) &
+disown

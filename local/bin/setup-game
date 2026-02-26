@@ -9,6 +9,10 @@ set -euo pipefail
 
 KEEP_CLASSES=("vesktop" "google-chrome-canary" "steam")
 
+# PID-unique prefix so repeated runs don't collide
+RULE_PREFIX="setup-$$"
+TEMP_RULE_NAMES=()
+
 # Check if a class should be kept
 should_keep() {
   local class="$1"
@@ -31,40 +35,51 @@ done
 
 sleep 0.5
 
-# Check if a window with given class is already running
-is_running() {
-  hyprctl clients -j | jq -e ".[] | select(.class == \"$1\")" > /dev/null 2>&1
+# Get the address of an already-running window by class
+get_window_addr() {
+  hyprctl clients -j | jq -r ".[] | select(.class == \"$1\") | .address" | head -1
 }
 
-# Wait for a new window matching a class on a workspace (up to 5s)
+# Wait for a window with given class to exist anywhere (up to 10s)
 wait_for_window() {
   local class="$1"
-  local ws="$2"
-  for _ in $(seq 1 50); do
+  for _ in $(seq 1 100); do
     sleep 0.1
-    if hyprctl clients -j | jq -e ".[] | select(.class == \"$class\" and .workspace.id == $ws)" > /dev/null 2>&1; then
+    if [[ -n "$(get_window_addr "$class")" ]]; then
       return 0
     fi
   done
-  echo "Warning: timed out waiting for $class on workspace $ws"
+  echo "Warning: timed out waiting for $class to appear"
   return 1
 }
 
-# Launch app if not already running, then move to target workspace
+# Move all windows of a class to a workspace
+move_all_to_ws() {
+  local class="$1"
+  local ws="$2"
+  hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | while read -r addr; do
+    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+  done
+}
+
+# Launch app if not already running, ensure it ends up on target workspace
 launch_or_move() {
   local class="$1"
   local cmd="$2"
   local ws="$3"
+  local rule_name="${RULE_PREFIX}-${class,,}"
 
-  if is_running "$class"; then
+  if [[ -n "$(get_window_addr "$class")" ]]; then
     echo "==> $class already running, moving to workspace $ws"
-    local addr
-    addr=$(hyprctl clients -j | jq -r ".[] | select(.class == \"$class\") | .address" | head -1)
-    hyprctl dispatch movetoworkspacesilent "$ws,address:$addr"
+    move_all_to_ws "$class" "$ws"
   else
-    echo "==> Launching $cmd on workspace $ws"
-    hyprctl dispatch exec "[workspace $ws] $cmd"
-    wait_for_window "$class" "$ws"
+    echo "==> Launching $cmd → workspace $ws"
+    # Named window rule catches ALL windows of this class (splash + main)
+    hyprctl keyword "windowrule[$rule_name]:match:class" "$class"
+    hyprctl keyword "windowrule[$rule_name]:workspace" "$ws silent"
+    TEMP_RULE_NAMES+=("$rule_name")
+    hyprctl dispatch exec "$cmd"
+    wait_for_window "$class" || return 1
   fi
 }
 
@@ -81,3 +96,12 @@ launch_or_move "vesktop" "vesktop" 3
 hyprctl dispatch workspace 1
 
 echo "Gaming setup complete!"
+
+# Clean up rules in background after apps have fully loaded
+(
+  sleep 30
+  for name in "${TEMP_RULE_NAMES[@]}"; do
+    hyprctl keyword "windowrule[$name]:enable" false 2>/dev/null
+  done
+) &
+disown
