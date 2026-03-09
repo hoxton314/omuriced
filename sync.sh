@@ -34,6 +34,8 @@ OMARCHY_SUBDIRS=(
 # ~/.local/bin scripts to copy
 LOCAL_BIN=(
     "gmail-mailto"
+    "setup-work"
+    "setup-game"
 )
 
 # ~/.local/share/applications entries to copy

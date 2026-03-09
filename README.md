@@ -1,4 +1,4 @@
-# omuriced
+# omuriced (desktop-multiple-monitors)
 
 Personal dotfiles for [Omarchy](https://omarchy.org/) - a Hyprland-based Linux desktop environment.
 
@@ -12,7 +12,7 @@ This repo contains:
 
 ```bash
 # Clone with submodules
-git clone --recurse-submodules git@github.com:hoxton314/omuriced.git
+git clone --recurse-submodules -b desktop-multiple-monitors git@github.com:hoxton314/omuriced.git
 
 # Backup existing configs (optional)
 ./backup.sh
