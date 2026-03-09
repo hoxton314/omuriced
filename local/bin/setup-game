@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Gaming layout setup
-# HDMI-A-1 (left)  - WS 3: Vesktop (Discord)
+# HDMI-A-1 (left)  - WS 3: Discord
 # DP-1 (main)      - WS 1: Steam
 # DP-3 (right)     - WS 2: Chrome Canary
 
 set -euo pipefail
 
-KEEP_CLASSES=("vesktop" "google-chrome-canary" "steam")
+KEEP_CLASSES=("discord" "google-chrome-canary" "steam")
 
 # PID-unique prefix so repeated runs don't collide
 RULE_PREFIX="setup-$$"
@@ -90,7 +90,7 @@ hyprctl dispatch moveworkspacetomonitor "3 HDMI-A-1"
 
 launch_or_move "steam" "steam" 1
 launch_or_move "google-chrome-canary" "google-chrome-canary" 2
-launch_or_move "vesktop" "vesktop" 3
+launch_or_move "discord" "discord" 3
 
 # Focus main monitor
 hyprctl dispatch workspace 1

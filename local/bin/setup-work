@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Work layout setup
-# HDMI-A-1 (left)  - WS 3: GitKraken (full left) | Vesktop (top right) / Slack (bottom right)
+# HDMI-A-1 (left)  - WS 3: GitKraken (full left) | Discord (top right) / Slack (bottom right)
 # DP-1 (main)      - WS 1: VS Code
 # DP-3 (right)     - WS 2: Chrome Canary
 
@@ -70,7 +70,7 @@ launch_or_move "google-chrome-canary" "google-chrome-canary" 2
 # Workspace 3 apps
 launch_or_move "GitKraken" "gitkraken" 3
 launch_or_move "Slack" "slack" 3
-launch_or_move "vesktop" "vesktop" 3
+launch_or_move "discord" "discord" 3
 
 # Focus main monitor
 hyprctl dispatch workspace 1
@@ -85,7 +85,7 @@ echo "Work setup complete!"
     sleep 0.5
     clients=$(hyprctl clients -j)
     gk=$(echo "$clients" | jq -r '[.[] | select(.class == "GitKraken" and .floating == false)] | first | .address // empty')
-    vk=$(echo "$clients" | jq -r '[.[] | select(.class == "vesktop" and .floating == false)] | first | .address // empty')
+    vk=$(echo "$clients" | jq -r '[.[] | select(.class == "discord" and .floating == false)] | first | .address // empty')
     sl=$(echo "$clients" | jq -r '[.[] | select(.class == "Slack" and .floating == false)] | first | .address // empty')
     [[ -n "$gk" && -n "$vk" && -n "$sl" ]] || continue
 
